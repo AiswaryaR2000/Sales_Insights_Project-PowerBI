@@ -1,0 +1,47 @@
+-- Retrieve all records from the 'customers' table in the 'sales' schema
+select * from sales.customers;
+
+-- Retrieve all records from the 'date' table in the 'sales' schema
+select * from sales.date;
+
+-- Retrieve all records from the 'markets' table in the 'sales' schema
+select * from sales.markets;
+
+-- Retrieve all records from the 'products' table in the 'sales' schema
+select * from sales.products;
+
+-- Retrieve all records from the 'transactions' table in the 'sales' schema
+select * from sales.transactions;
+
+-- Get the total sales amount for the month of January in the year 2020
+-- This joins the 'transactions' and 'date' tables using the order date and filters on year and month
+SELECT SUM(transactions.sales_amount) 
+FROM sales.transactions 
+INNER JOIN sales.date 
+ON transactions.order_date = date.date 
+WHERE date.year = 2020 
+AND date.month_name = "January"; 
+/* Optional filter to restrict to INR or USD currency can be used here
+   AND (transactions.currency = "INR" OR transactions.currency = "USD"); */
+
+-- Find all transactions where the currency contains 'USD'
+-- Useful for filtering data related to USD transactions (even if stored with variations like 'USD$', 'USD-INR')
+select * from sales.transactions where currency like '%USD%';
+
+-- Find all transactions where the sales amount is less than or equal to 1
+-- This helps in identifying potential outliers, errors, or very low-value transactions
+select * from sales.transactions where sales_amount <= 1;
+
+-- Identify duplicate transactions based on key fields
+-- Groups transactions on all relevant columns and returns only those groups that occur more than once
+select count(*) 
+from sales.transactions
+group by product_code, customer_code, market_code, order_date, sales_qty, sales_amount, currency, profit_margin_percentage, profit_margin, cost_price
+having count(*) > 1;
+
+-- Calculate the total sales amount across all transactions
+-- Joins with the date table to ensure proper matching and possibly use date-based filtering later
+select SUM(sales_amount) 
+from sales.transactions a 
+JOIN sales.date b 
+on a.order_date = b.date;
